@@ -1,0 +1,56 @@
+/*
+int countequal(int arr1[], int arr2[], int size) {
+    int count = 0;
+    for (int i = 0; i < size; i++) {
+        if (arr1[i] == arr2[i]) {
+            count++;
+        }
+    }
+    return count;
+}
+}
+ */
+.globl _start
+.data
+    arr1:  .word 5, 3, 7, 2, 8    # Primo array
+arr2:  .word 5, 4, 7, 2, 1    # Secondo array (coincidono gli indici 0, 2, 3)
+size:  .word 5                # Dimensione degli array
+    
+.text
+_start:
+    la   a0, arr1             # a0 = indirizzo base arr1
+    la   a1, arr2             # a1 = indirizzo base arr2
+    la   a2, size             
+    lw   a2, 0(a2)            # a2 = valore size (5)
+    
+    jal  ra, countequal       # Chiamata alla procedura
+    # Fine programma (Exit ecall)
+    li   a7, 10
+    ecall
+
+countequal:
+    li t0,0 #i=0
+    li t1,0 #count
+    
+    loop:
+    bge t0,a2,end_loop #i>size
+    #cerco l'offset
+    slli t2,t0,2 #t2=t0*4; -> i*4
+    #trovo l'indirizzo dell'elemento in arr1 e lo carico
+    add t3,a0,t2 # t3= indirizzo base + offset
+    lw t4,0(t3) #t4=arr[i]
+
+    #facciamo anche per arr2
+    add t5,a1,t2 #t5=ind base + offset
+    lw t6,0(t5) #t6=arr2[i]
+
+    bne t4,t6,salta_count
+    addi t1,t1,1
+    salta_count:
+    addi t0,t0,1
+    j loop
+    end_loop:
+        mv a0,t1
+        ret
+    
+    
